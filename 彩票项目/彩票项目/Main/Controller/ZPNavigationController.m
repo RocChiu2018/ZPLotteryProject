@@ -41,7 +41,7 @@
     
     /**
      设置导航栏的背景图片：
-     retina屏的情况下：iOS6系统下的导航栏的高度是88像素，iOS7及以上系统，导航栏与状态栏应该算作一体，让美工做高为128像素的导航栏的背景图片。
+     retina屏的情况下：iOS6系统下的导航栏的高度是88像素，iOS7及以上系统下导航栏与状态栏应该算作一体，在这种情况下想要设置导航栏的背景图片的话就需要高为128像素的图片了。
      */
     NSString *bgImage = nil;
     if (iOS7)  //iOS7及以上的系统
@@ -50,9 +50,8 @@
         
         /**
          修改导航栏上系统原生的返回按钮的颜色：
-         导航栏上系统原生的返回按钮的颜色为蓝色，需要通过下面的代码对返回按钮的颜色进行修改；
-         当push到视图控制器栈中的非根视图控制器的返回按钮使用的是系统原生的返回按钮的话则自带滑动返回功能，如果不使用系统原生的而是自定义返回按钮的话则原来自带的滑动返回功能就会消失；
-         由于下面的代码仅仅是修改系统原生的返回按钮的颜色，所以原来系统自带的滑动返回功能不会消失。
+         导航栏上系统原生的返回按钮的颜色默认是蓝色的，如果需要更改它的颜色的话就要撰写下行的代码；
+         当页面push到视图控制器栈中的非根视图控制器的时候，如果导航栏上的返回按钮使用的是系统原生的话则自带滑动返回功能，如果使用的是自定义返回按钮的话则原来自带的滑动返回功能就会消失。由于下面的代码仅仅是修改系统原生的返回按钮的颜色，所以系统自带的滑动返回功能不会消失。
          */
         navBar.tintColor = [UIColor whiteColor];
     }else   //iOS7以下的系统
@@ -107,7 +106,7 @@
 }
 
 #pragma mark ————— push方法 —————
-//重写这个方法的目的是让界面每次跳转到新的视图控制器的时候下面的tabbar隐藏，不用每次都在storyboard中设置了。
+//重写这个方法的目的就是让页面每次跳转到新的视图控制器的时候下面的tabbar隐藏，不用每次都在storyboard中设置了。
 - (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated
 {
     //先调用父类的这个方法
@@ -125,7 +124,7 @@
         viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"NavBack"] style:UIBarButtonItemStylePlain target:self action:@selector(back)];
         
         /**
-         如果导航栏上的返回按钮使用的是自定义按钮而又想让系统自带的滑动返回功能不消失的话，就需要在本方法中撰写下面的代码使<UIGestureRecognizerDelegate>代理为nil。这样做之后，虽然视图控制器栈中的非根视图控制器具备了滑动返回的功能，但是当pop到此导航视图控制栈中的根视图控制器中以后，如果用户在这个根视图控制器中模仿滑动返回动作（在根视图控制器中的左侧做向右滑动的动作）之后，再点击这个根视图控制器导航栏右侧的“设置”按钮，则程序会崩溃。为了修复上述的问题，在程序运行以后，首先要在本类中的"viewDidLoad"方法中把"self.interactivePopGestureRecognizer.delegate"赋值给本类的一个属性，用来把它存储住，再在视图控制器push到视图控制器栈中的时候（本方法）把"self.interactivePopGestureRecognizer.delegate"设为nil，最后在pop回视图控制器栈中的根视图控制器的方法(navigationController: didShowViewController: animated: )中把之前利用属性存储的"self.interactivePopGestureRecognizer.delegate"再赋值回来即可。
+         如果导航栏上的返回按钮使用的是自定义按钮而又想让系统自带的滑动返回功能不消失的话，就需要在本方法中撰写下面的代码使<UIGestureRecognizerDelegate>代理为nil。这样做之后，虽然视图控制器栈中的非根视图控制器具备了滑动返回的功能，但是当pop到此导航视图控制栈中的根视图控制器中以后，如果用户在这个根视图控制器中模仿滑动返回动作（在根视图控制器中的左侧做向右滑动的动作）之后，再点击这个根视图控制器导航栏右侧的“设置”按钮，则程序会崩溃。为了修复上述的问题，在程序运行以后，首先要在本类中的"viewDidLoad"方法中把"self.interactivePopGestureRecognizer.delegate"赋值给本类的一个属性，用来把它存储住，再在新的视图控制器push到视图控制器栈中的时候（本方法）把"self.interactivePopGestureRecognizer.delegate"设为nil，最后在pop回视图控制器栈中的根视图控制器的方法(navigationController: didShowViewController: animated: )中把之前利用属性存储的"self.interactivePopGestureRecognizer.delegate"再赋值回来即可。
          */
         self.interactivePopGestureRecognizer.delegate = nil;
     }
@@ -141,7 +140,10 @@
 //当视图控制器push或pop完之后，系统就会自动调用这个代理方法。
 - (void)navigationController:(UINavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated
 {
-    //viewController参数代表的是系统push或pop后显示的新的视图控制器
+    /**
+     方法中的viewController参数代表的是系统push或pop后显示的新的视图控制器；
+     判断新的视图控制器是不是栈中的根视图控制器。
+     */
     if (viewController == [self.viewControllers firstObject])
     {
         self.interactivePopGestureRecognizer.delegate = self.gestureRecognizerDelegate;

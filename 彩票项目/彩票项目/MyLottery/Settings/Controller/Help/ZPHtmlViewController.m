@@ -20,7 +20,7 @@
  此方法先于"viewDidLoad"方法而被调用；
  此方法用来自定义view。
  */
--(void)loadView
+- (void)loadView
 {
     self.view = [[UIWebView alloc] init];  //让整个view成为webview
 }
